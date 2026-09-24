@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SignEase — Sign Language Translator</title>
+<style>
+:root{
+  --primary:#243b8f;--primary2:#4f46b5;--teal:#0f9f9a;
+  --bg:#f5f7fb;--card:#fff;--text:#172033;--muted:#667085;
+  --border:#e6e9f0;--success:#159957;--danger:#d92d20;
+  --shadow:0 12px 35px rgba(24,39,75,.08);--radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0}
+a{text-decoration:none;color:inherit}
+.container{width:min(1160px,92%);margin:auto}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:700;transition:.2s}
+.btn-primary{background:var(--primary);color:white}.btn-primary:hover{background:var(--primary2);transform:translateY(-1px)}
+.btn-light{background:white;border:1px solid var(--border);color:var(--text)}
+.btn-danger{background:#fff0ef;color:var(--danger)}
+.badge{display:inline-flex;padding:5px 10px;border-radius:999px;background:#edf0ff;color:var(--primary);font-size:12px;font-weight:700}
+.toast{position:fixed;right:24px;bottom:24px;background:#172033;color:white;padding:13px 17px;border-radius:12px;box-shadow:var(--shadow);z-index:1000}
+.navbar{height:74px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;position:sticky;top:0;z-index:50}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:min(1160px,92%);margin:auto}
+.logo{font-size:22px;font-weight:900;color:var(--primary)}.logo span{color:var(--teal)}
+.navlinks{display:flex;gap:24px;align-items:center;color:#475467;font-size:14px;font-weight:600}
+.navlinks a:hover{color:var(--primary)}
+.hero{padding:85px 0 70px;background:linear-gradient(135deg,#f8f9ff,#eefafa)}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:55px;align-items:center}
+.hero h1{font-size:clamp(42px,6vw,68px);line-height:1.04;letter-spacing:-2px;margin:15px 0}
+.hero p{font-size:18px;color:var(--muted);max-width:610px}.hero-actions{display:flex;gap:12px;margin-top:28px}
+.hero-card{background:white;border:1px solid var(--border);border-radius:28px;padding:28px;box-shadow:var(--shadow)}
+.camera-art{height:340px;border-radius:22px;background:linear-gradient(145deg,#202a55,#5365bd);display:flex;align-items:center;justify-content:center;color:white;position:relative;overflow:hidden}
+.hand{font-size:110px;filter:drop-shadow(0 10px 12px rgba(0,0,0,.25))}
+.camera-label{position:absolute;left:18px;top:18px;background:rgba(255,255,255,.15);padding:8px 12px;border-radius:10px;font-size:12px}
+section{padding:72px 0}.section-head{text-align:center;max-width:680px;margin:0 auto 40px}.section-head h2{font-size:34px;margin-bottom:8px}.section-head p{color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow)}
+.feature-icon{width:48px;height:48px;border-radius:14px;background:#eef0ff;color:var(--primary);display:grid;place-items:center;font-size:22px;margin-bottom:16px}
+.card h3{margin-bottom:7px}.card p{color:var(--muted);font-size:14px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.step{text-align:center}.step-num{width:48px;height:48px;background:var(--primary);color:white;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;font-weight:800}
+.access{background:#17233f;color:white}.access p{color:#cbd5e1}.access .cards{margin-top:28px}.access .card{background:#202d4c;border-color:#354260;color:white}.access .card p{color:#cbd5e1}
+footer{background:#101827;color:#cbd5e1;padding:38px 0}.footer-inner{display:flex;justify-content:space-between;gap:20px}.footer-links{display:flex;gap:20px;font-size:14px}
+.auth-wrap{min-height:calc(100vh - 74px);display:grid;place-items:center;padding:35px 0}.auth-card{width:min(470px,92%);background:white;border:1px solid var(--border);border-radius:22px;padding:32px;box-shadow:var(--shadow)}.auth-card h1{margin-bottom:6px}.muted{color:var(--muted);font-size:14px}
+.form-group{margin:16px 0}.form-group label{display:block;font-weight:700;font-size:13px;margin-bottom:6px}.input{width:100%;padding:12px 13px;border:1px solid #d8dce5;border-radius:11px;outline:0;background:white}.input:focus{border-color:var(--primary);box-shadow:0 0 0 3px #e8ebff}
+.app-layout{display:flex;min-height:calc(100vh - 74px)}.sidebar{width:240px;background:white;border-right:1px solid var(--border);padding:24px 15px;position:sticky;top:74px;height:calc(100vh - 74px)}.side-title{padding:0 12px 18px;font-weight:900;color:var(--primary)}.side-link{display:flex;gap:10px;padding:11px 12px;border-radius:10px;color:#667085;font-weight:600;font-size:14px;margin:3px 0}.side-link:hover,.side-link.active{background:#eef0ff;color:var(--primary)}.main{flex:1;padding:30px;min-width:0}.topline{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:25px}.topline h1{font-size:28px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-bottom:22px}.stat{background:white;border:1px solid var(--border);padding:20px;border-radius:15px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:28px;margin-top:4px}.grid-2{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}.quick{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:14px}.table th,.table td{padding:13px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}.table th{color:var(--muted);font-size:12px}
+.translator-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:20px}.camera-box{background:#101828;border-radius:20px;min-height:430px;position:relative;overflow:hidden;display:grid;place-items:center}.camera-box video{width:100%;height:100%;min-height:430px;object-fit:cover}.camera-box canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.landmark-status{position:absolute;top:16px;right:16px;background:rgba(0,0,0,.5);color:#fff;padding:6px 11px;border-radius:8px;font-size:12px;z-index:5}.camera-placeholder{color:white;text-align:center}.camera-controls{position:absolute;bottom:16px;left:16px;right:16px;display:flex;gap:8px}.camera-controls .btn{background:rgba(255,255,255,.92)}.result{display:flex;flex-direction:column;gap:16px}.result-box{padding:22px;background:#f8f9ff;border:1px solid #e1e5ff;border-radius:16px}.result-box .value{font-size:31px;font-weight:900;color:var(--primary);margin-top:4px}.actions{display:flex;flex-wrap:wrap;gap:8px}.notice{padding:13px 15px;border-radius:12px;background:#fff8e6;color:#8a5b00;font-size:13px}
+.search-row{display:flex;gap:10px;margin-bottom:20px}.sign-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px}.sign-img{height:150px;border-radius:14px;background:linear-gradient(135deg,#e9edff,#e8faf9);display:grid;place-items:center;font-size:52px;margin-bottom:14px}.sign-card h3{margin-bottom:3px}.sign-card small{color:var(--muted)}.sign-actions{display:flex;gap:8px;margin-top:13px}.sign-actions .btn{padding:8px 11px;font-size:12px}
+.progress{height:9px;background:#e8ebf1;border-radius:99px;overflow:hidden}.progress > div{height:100%;background:var(--teal);border-radius:99px;transition:width .3s}
+.profile-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:18px}.avatar{width:90px;height:90px;border-radius:50%;background:#e9edff;color:var(--primary);display:grid;place-items:center;font-size:35px;font-weight:900;margin-bottom:15px}
+.admin-tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}.admin-tabs button.active{background:var(--primary);color:white}
+@media(max-width:900px){.hero-grid,.translator-grid,.grid-2,.profile-grid{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}.steps{grid-template-columns:repeat(2,1fr)}.sign-grid{grid-template-columns:repeat(2,1fr)}.stats{grid-template-columns:repeat(2,1fr)}.navlinks{display:none}.sidebar{position:fixed;left:-250px;z-index:40;transition:.25s}.sidebar.open{left:0}.main{padding:20px}.menu-btn{display:inline-flex!important}}
+@media(max-width:560px){.cards,.steps,.sign-grid,.stats{grid-template-columns:1fr}.hero{padding-top:55px}.hero-actions{flex-direction:column}.footer-inner{flex-direction:column}.main{padding:15px}.topline{align-items:flex-start}.topline h1{font-size:23px}.camera-box,.camera-box video{min-height:320px}.menu-btn{display:inline-flex!important}}
+.menu-btn{display:none}
+</style>
+</head>
+<body>
+<div id="toast" class="toast hidden"></div>
+
+<header class="navbar">
+  <div class="nav-inner">
+    <a class="logo" href="#home">Sign<span>Ease</span></a>
+    <nav class="navlinks">
+      <a href="#home">Home</a><a href="#how">How It Works</a><a href="#features">Features</a>
+      <a href="#about">About</a><a href="#contact">Contact</a>
+      <a href="javascript:showPage('login')">Login</a>
+      <button class="btn btn-primary" onclick="showPage('register')">Get Started</button>
+    </nav>
+    <button class="btn btn-light menu-btn" onclick="toggleSidebar()">☰</button>
+  </div>
+</header>
+
+<!-- LANDING -->
+<div id="landing">
+<section class="hero" id="home">
+<div class="container hero-grid">
+<div>
+<span class="badge">ACCESSIBILITY • AI • DBMS</span>
+<h1>Breaking Barriers Through Sign Language.</h1>
+<p>Translate sign language into text and speech using an intelligent, accessible interface designed for everyday communication and learning.</p>
+<div class="hero-actions">
+<button class="btn btn-primary" onclick="showPage('login')">Start Translating →</button>
+<button class="btn btn-light" onclick="document.getElementById('how').scrollIntoView()">Learn Sign Language</button>
+</div>
+</div>
+<div class="hero-card"><div class="camera-art"><div class="camera-label">LIVE SIGN RECOGNITION</div><div class="hand">🖐️</div></div></div>
+</div>
+</section>
+
+<section id="features">
+<div class="container">
+<div class="section-head"><h2>Everything you need to communicate</h2><p>A complete frontend experience prepared for future ML and DBMS integration.</p></div>
+<div class="cards">
+<div class="card"><div class="feature-icon">📷</div><h3>Real-Time Translation</h3><p>Use your camera to interact with the translation workspace.</p></div>
+<div class="card"><div class="feature-icon">🔊</div><h3>Text & Speech</h3><p>Convert translated text into spoken audio with the browser speech API.</p></div>
+<div class="card"><div class="feature-icon">📖</div><h3>Sign Dictionary</h3><p>Search and explore common signs by category.</p></div>
+<div class="card"><div class="feature-icon">🕘</div><h3>Translation History</h3><p>Keep track of previous translations for easy reference.</p></div>
+<div class="card"><div class="feature-icon">🎓</div><h3>Learn Sign Language</h3><p>Practice signs and track your learning progress.</p></div>
+<div class="card"><div class="feature-icon">👤</div><h3>User Profiles</h3><p>Manage your profile, favorites, feedback and preferences.</p></div>
+</div>
+</div>
+</section>
+
+<section id="how">
+<div class="container">
+<div class="section-head"><h2>How it works</h2><p>A simple four-step communication flow.</p></div>
+<div class="steps">
+<div class="step"><div class="step-num">1</div><h3>Show your sign</h3><p class="muted">Position your hand in front of the camera.</p></div>
+<div class="step"><div class="step-num">2</div><h3>Camera captures</h3><p class="muted">The browser accesses your camera stream.</p></div>
+<div class="step"><div class="step-num">3</div><h3>Recognize</h3><p class="muted">The future ML model identifies the gesture.</p></div>
+<div class="step"><div class="step-num">4</div><h3>Translate</h3><p class="muted">The result appears as text and can be spoken aloud.</p></div>
+</div>
+</div>
+</section>
+
+<section class="access" id="about">
+<div class="container">
+<div class="section-head"><h2>Designed for accessibility</h2><p>Built to support communication in real-world environments.</p></div>
+<div class="cards">
+<div class="card"><h3>🏫 Schools & Colleges</h3><p>Support inclusive communication and learning.</p></div>
+<div class="card"><h3>💼 Workplaces</h3><p>Make everyday professional interaction easier.</p></div>
+<div class="card"><h3>🌐 Public Spaces</h3><p>Provide a simple communication aid wherever it is needed.</p></div>
+</div>
+</div>
+</section>
+</div>
+
+<!-- AUTH -->
+<div id="loginPage" class="hidden">
+<div class="auth-wrap"><div class="auth-card">
+<h1>Welcome back</h1><p class="muted">Login to your SignEase account.</p>
+<form onsubmit="backendLogin(event)">
+<div class="form-group"><label>Email</label><input id="loginEmail" class="input" type="email" required></div>
+<div class="form-group"><label>Password</label><input id="loginPassword" class="input" type="password" required></div>
+<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><label><input type="checkbox"> Remember me</label><a href="#" onclick="toast('Password recovery will be connected to the backend.')">Forgot password?</a></div>
+<button class="btn btn-primary" style="width:100%;margin-top:20px">Login</button>
+</form>
+<p style="margin-top:15px;text-align:center;font-size:14px">Don't have an account? <a href="#" onclick="showPage('register')" style="color:var(--primary);font-weight:700">Create one</a></p>
+</div></div>
+</div>
+
+<div id="registerPage" class="hidden">
+<div class="auth-wrap"><div class="auth-card">
+<h1>Create your account</h1><p class="muted">Start using SignEase today.</p>
+<form onsubmit="backendRegister(event)">
+<div class="form-group"><label>Full Name</label><input id="regName" class="input" required></div>
+<div class="form-group"><label>Email</label><input id="regEmail" class="input" type="email" required></div>
+<div class="form-group"><label>Phone Number</label><input id="regPhone" class="input" type="tel"></div>
+<div class="form-group"><label>Preferred Language</label><select id="regLang" class="input"><option>English</option><option>Telugu</option><option>Hindi</option></select></div>
+<div class="form-group"><label>Password</label><input id="regPassword" class="input" type="password" minlength="6" required></div>
+<div class="form-group"><label>Confirm Password</label><input id="regConfirm" class="input" type="password" required></div>
+<label style="font-size:13px"><input type="checkbox" required> I agree to the Terms & Conditions</label>
+<button class="btn btn-primary" style="width:100%;margin-top:20px">Create Account</button>
+</form>
+<p style="margin-top:15px;text-align:center;font-size:14px">Already have an account? <a href="#" onclick="showPage('login')" style="color:var(--primary);font-weight:700">Login</a></p>
+</div></div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+<div class="app-layout">
+<aside id="sidebar" class="sidebar">
+<div class="side-title">SignEase</div>
+<a class="side-link active" data-page="dashboard" onclick="appPage('dashboard')">🏠 Dashboard</a>
+<a class="side-link" data-page="translator" onclick="appPage('translator')">📷 Translate</a>
+<a class="side-link" data-page="dictionary" onclick="appPage('dictionary')">📖 Dictionary</a>
+<a class="side-link" data-page="history" onclick="appPage('history')">🕘 History</a>
+<a class="side-link" data-page="favorites" onclick="appPage('favorites')">♡ Favorites</a>
+<a class="side-link" data-page="learning" onclick="appPage('learning')">🎓 Learn</a>
+<a class="side-link" data-page="feedback" onclick="appPage('feedback')">💬 Feedback</a>
+<a class="side-link" data-page="profile" onclick="appPage('profile')">👤 Profile</a>
+<a class="side-link" data-page="train" onclick="appPage('train')">🧠 Train Signs</a>
+<hr style="border:0;border-top:1px solid var(--border);margin:15px 0">
+<a class="side-link" data-page="admin" onclick="appPage('admin')">⚙️ Admin</a>
+<a class="side-link" onclick="logout()">↪ Logout</a>
+</aside>
+<main class="main">
+<div id="appContent"></div>
+</main>
+</div>
+</div>
+
+<script>
+/* ===================== BACKEND CONNECTION ===================== */
+const API_BASE_URL = "http://127.0.0.1:8000"; // Replace with deployed backend URL later.
+
+function authHeaders() {
+  const token = localStorage.getItem("signeaseToken");
+  return token ? { "Authorization": `Bearer ${token}` } : {};
+}
+
+async function api(path, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders(),
+      ...(options.headers || {})
+    }
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.detail || "Request failed");
+  return data;
+}
+
+async function backendLogin(e) {
+  e.preventDefault();
+  try {
+    const data = await api("/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: document.getElementById("loginEmail").value,
+        password: document.getElementById("loginPassword").value
+      })
+    });
+    localStorage.setItem("signeaseToken", data.accessToken);
+    localStorage.setItem("signeaseUser", JSON.stringify(data.user));
+    currentUser = data.user;
+    toast("Login successful");
+    showPage("app");
+  } catch (err) { toast(err.message); }
+}
+
+async function backendRegister(e) {
+  e.preventDefault();
+  const password = document.getElementById("regPassword").value;
+  const confirm = document.getElementById("regConfirm").value;
+  if (password !== confirm) return toast("Passwords do not match.");
+  try {
+    const data = await api("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        name: document.getElementById("regName").value,
+        email: document.getElementById("regEmail").value,
+        phone: document.getElementById("regPhone").value,
+        language: document.getElementById("regLang").value,
+        password
+      })
+    });
+    localStorage.setItem("signeaseToken", data.accessToken);
+    localStorage.setItem("signeaseUser", JSON.stringify(data.user));
+    currentUser = data.user;
+    toast("Account created");
+    showPage("app");
+  } catch (err) { toast(err.message); }
+}
+
+/* ===================== APP STATE ===================== */
+const signs=[
+{name:"Hello",meaning:"Hello",category:"Greetings",icon:"👋"},
+{name:"Thank You",meaning:"Thank you",category:"Greetings",icon:"🙏"},
+{name:"Please",meaning:"Please",category:"Common Words",icon:"🤲"},
+{name:"Sorry",meaning:"Sorry",category:"Common Words",icon:"🙇"},
+{name:"Yes",meaning:"Yes",category:"Common Words",icon:"👍"},
+{name:"No",meaning:"No",category:"Common Words",icon:"👎"},
+{name:"Help",meaning:"Help",category:"Emergency",icon:"🆘"},
+{name:"Good Morning",meaning:"Good morning",category:"Greetings",icon:"🌅"},
+{name:"Good Night",meaning:"Good night",category:"Greetings",icon:"🌙"},
+{name:"I Love You",meaning:"I love you",category:"Emotions",icon:"❤️"},
+{name:"Welcome",meaning:"Welcome",category:"Greetings",icon:"🤝"},
+{name:"Friend",meaning:"Friend",category:"Daily Communication",icon:"🧑‍🤝‍🧑"},
+{name:"Family",meaning:"Family",category:"Daily Communication",icon:"👨‍👩‍👧"},
+{name:"Water",meaning:"Water",category:"Daily Communication",icon:"💧"},
+{name:"Food",meaning:"Food",category:"Daily Communication",icon:"🍴"}
+];
+let currentUser=JSON.parse(localStorage.getItem("signeaseUser")||"null");
+let cameraStream=null;
+let favoritesCache=[];
+let historyCache=[];
+let progressCache=0;
+
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.remove("hidden");setTimeout(()=>t.classList.add("hidden"),2800)}
+function showPage(page){
+ document.getElementById("landing").classList.toggle("hidden",page!=="landing");
+ document.getElementById("loginPage").classList.toggle("hidden",page!=="login");
+ document.getElementById("registerPage").classList.toggle("hidden",page!=="register");
+ document.getElementById("app").classList.toggle("hidden",page!=="app");
+ if(page==="app") appPage("dashboard");
+ window.scrollTo(0,0);
+}
+function logout(){stopCamera();localStorage.removeItem("signeaseUser");localStorage.removeItem("signeaseToken");currentUser=null;showPage("landing");toast("Logged out successfully")}
+function toggleSidebar(){document.getElementById("sidebar").classList.toggle("open")}
+
+function appPage(page){
+ document.querySelectorAll(".side-link").forEach(x=>x.classList.toggle("active",x.dataset.page===page));
+ if(window.innerWidth<900)document.getElementById("sidebar").classList.remove("open");
+ const c=document.getElementById("appContent");
+ const name=currentUser?.name||"User";
+ const pages={dashboard:dashboardHTML,translator:translatorHTML,dictionary:dictionaryHTML,history:historyHTML,favorites:favoritesHTML,learning:learningHTML,profile:profileHTML,feedback:feedbackHTML,admin:adminHTML,train:trainHTML};
+ c.innerHTML=(pages[page]||dashboardHTML)(name);
+ if(page==="dictionary")renderSigns();
+ if(page==="favorites")loadFavorites();
+ if(page==="history")loadHistory();
+ if(page==="dashboard")loadDashboard();
+ if(page==="learning")loadProgress();
+ if(page==="admin")renderAdmin("users");
+ if(page==="train")refreshSampleCounts();
+}
+
+/* ===================== DASHBOARD ===================== */
+function dashboardHTML(name){
+ return `<div class="topline"><div><span class="badge">USER DASHBOARD</span><h1>Good morning, ${escapeHtml(name)} 👋</h1><p class="muted">Here's your SignEase activity overview.</p></div><button class="btn btn-light" onclick="toggleTextSize()">A↕ Text Size</button></div>
+ <div class="stats"><div class="stat"><small>Total Translations</small><strong id="statTranslations">…</strong></div><div class="stat"><small>Saved Signs</small><strong id="statFavorites">…</strong></div><div class="stat"><small>Learning Progress</small><strong id="statProgress">…</strong></div><div class="stat"><small>Favorites</small><strong id="statFavorites2">…</strong></div></div>
+ <div class="grid-2"><div class="card"><h2>Quick Actions</h2><div class="quick"><button class="btn btn-primary" onclick="appPage('translator')">📷 Start Translation</button><button class="btn btn-light" onclick="appPage('dictionary')">📖 Open Dictionary</button><button class="btn btn-light" onclick="appPage('learning')">🎓 Continue Learning</button></div></div>
+ <div class="card"><h2>Learning Progress</h2><p class="muted" style="margin:8px 0">Basic Greetings</p><div class="progress"><div id="dashProgressBar" style="width:0%"></div></div><p class="muted" style="margin-top:8px" id="dashProgressText">Loading…</p></div></div>
+ <div class="card" style="margin-top:18px"><h2>Recent Translations</h2><div id="recentTranslations"><p class="muted" style="margin-top:12px">Loading…</p></div></div>`;
+}
+async function loadDashboard(){
+  try{
+    const [translations, favorites, progress] = await Promise.all([
+      api("/translations"), api("/favorites"), api("/progress")
+    ]);
+    historyCache = normalizeTranslations(translations);
+    favoritesCache = normalizeFavorites(favorites);
+    progressCache = progress?.progress ?? 0;
+    const set=(id,val)=>{const el=document.getElementById(id);if(el)el.textContent=val};
+    set("statTranslations", historyCache.length);
+    set("statFavorites", favoritesCache.length);
+    set("statFavorites2", favoritesCache.length);
+    set("statProgress", progressCache+"%");
+    const bar=document.getElementById("dashProgressBar");if(bar)bar.style.width=progressCache+"%";
+    set("dashProgressText", progressCache+"% complete");
+    const recent = historyCache.slice(-5).reverse();
+    const box=document.getElementById("recentTranslations");
+    if(box)box.innerHTML = recent.length ? recent.map(h=>`<p style="padding:12px 0;border-bottom:1px solid var(--border)"><b>${escapeHtml(h.sign)}</b> → ${escapeHtml(h.translation)} <span class="muted" style="float:right">${escapeHtml(h.date)}</span></p>`).join("") : "<p class='muted' style='margin-top:12px'>No translations yet. Start your first translation.</p>";
+  }catch(err){ toast("Could not load dashboard: "+err.message); }
+}
+
+/* ===================== TRANSLATOR ===================== */
+function translatorHTML(){
+ return `<div class="topline"><div><span class="badge">TRANSLATOR</span><h1>Sign Language Translator</h1><p class="muted">Use the camera or select a sign in demo mode.</p></div></div>
+ <div class="translator-grid"><div class="card"><div class="camera-box"><video id="cameraVideo" autoplay playsinline class="hidden"></video><canvas id="landmarkCanvas" class="hidden"></canvas><div id="landmarkStatus" class="landmark-status hidden">Loading hand model…</div><div id="cameraPlaceholder" class="camera-placeholder"><div style="font-size:70px">📷</div><h2>Live Camera</h2><p>Start the camera to begin.</p></div><div class="camera-controls"><button class="btn" onclick="startCamera()">▶ Start Camera</button><button class="btn" onclick="stopCamera()">■ Stop Camera</button><button class="btn" onclick="switchCamera()">↻ Switch</button></div></div></div>
+ <div class="result"><div class="card"><h3>Demo Sign</h3><select class="input" onchange="selectSign(this.value)" style="margin-top:10px">${signs.map(s=>`<option>${s.name}</option>`).join("")}</select><div class="notice" style="margin-top:12px">Demo Recognition Mode — Connect the ML model for real-time recognition.</div></div>
+ <div class="card"><div class="result-box"><small class="muted">Detected Sign</small><div id="detected" class="value">HELLO</div></div><div class="result-box"><small class="muted">Translation</small><div id="translation" class="value">Hello</div></div><div class="actions"><button class="btn btn-primary" onclick="speakTranslation()">🔊 Speak</button><button class="btn btn-light" onclick="copyTranslation()">Copy</button><button class="btn btn-light" onclick="saveTranslation()">♡ Save</button><button class="btn btn-danger" onclick="clearTranslation()">Clear</button></div></div></div></div>`;
+}
+function selectSign(name){const s=signs.find(x=>x.name===name)||signs[0];document.getElementById("detected").textContent=s.name.toUpperCase();document.getElementById("translation").textContent=s.meaning}
+async function startCamera(){
+ try{
+   cameraStream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});
+   const v=document.getElementById("cameraVideo");
+   v.srcObject=cameraStream;
+   v.classList.remove("hidden");
+   document.getElementById("cameraPlaceholder").classList.add("hidden");
+   toast("Camera started");
+   startHandTracking();
+ }
+ catch(e){toast("Camera permission denied or camera unavailable.")}
+}
+function stopCamera(){
+ stopHandTracking();
+ if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null}
+ const v=document.getElementById("cameraVideo");if(v){v.srcObject=null;v.classList.add("hidden")}
+ const p=document.getElementById("cameraPlaceholder");if(p)p.classList.remove("hidden")
+}
+async function switchCamera(){stopCamera();setTimeout(startCamera,150)}
+
+/* ===================== HAND LANDMARK TRACKING (MediaPipe) ===================== */
+let handLandmarker=null;
+let handTrackingActive=false;
+let handTrackingRafId=null;
+let lastVideoTime=-1;
+
+async function ensureHandLandmarker(){
+  if(handLandmarker) return handLandmarker;
+  const statusEl=document.getElementById("landmarkStatus");
+  if(statusEl){statusEl.textContent="Loading hand model…";statusEl.classList.remove("hidden")}
+  try{
+    const vision = await import("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14");
+    const { HandLandmarker, FilesetResolver } = vision;
+    const filesetResolver = await FilesetResolver.forVisionTasks(
+      "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm"
+    );
+    handLandmarker = await HandLandmarker.createFromOptions(filesetResolver, {
+      baseOptions: {
+        modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+        delegate: "GPU"
+      },
+      runningMode: "VIDEO",
+      numHands: 1
+    });
+    if(statusEl) statusEl.classList.add("hidden");
+    return handLandmarker;
+  }catch(err){
+    console.error("Failed to load hand landmark model:", err);
+    if(statusEl){statusEl.textContent="Hand model failed to load";}
+    toast("Could not load the hand-tracking model. Check your internet connection.");
+    return null;
+  }
+}
+
+async function startHandTracking(){
+  const model = await ensureHandLandmarker();
+  if(!model) return;
+  const canvas=document.getElementById("landmarkCanvas");
+  if(canvas) canvas.classList.remove("hidden");
+  handTrackingActive=true;
+  runHandTrackingLoop();
+}
+
+function stopHandTracking(){
+  handTrackingActive=false;
+  if(handTrackingRafId) cancelAnimationFrame(handTrackingRafId);
+  handTrackingRafId=null;
+  const canvas=document.getElementById("landmarkCanvas");
+  if(canvas){
+    canvas.classList.add("hidden");
+    const ctx=canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+  }
+}
+
+const HAND_CONNECTIONS=[[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[0,9],[9,10],[10,11],[11,12],[0,13],[13,14],[14,15],[15,16],[0,17],[17,18],[18,19],[19,20],[5,9],[9,13],[13,17]];
+
+function runHandTrackingLoop(){
+  const video=document.getElementById("cameraVideo");
+  const canvas=document.getElementById("landmarkCanvas");
+  if(!video||!canvas||!handTrackingActive||!handLandmarker) return;
+
+  if(video.videoWidth && video.videoHeight){
+    if(canvas.width!==video.videoWidth||canvas.height!==video.videoHeight){
+      canvas.width=video.videoWidth;
+      canvas.height=video.videoHeight;
+    }
+    if(video.currentTime!==lastVideoTime){
+      lastVideoTime=video.currentTime;
+      const result=handLandmarker.detectForVideo(video, performance.now());
+      drawLandmarks(canvas, result);
+    }
+  }
+  handTrackingRafId=requestAnimationFrame(runHandTrackingLoop);
+}
+
+let lastDetectedLandmarks=null;
+
+function drawLandmarks(canvas, result){
+  const ctx=canvas.getContext("2d");
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  lastDetectedLandmarks = (result && result.landmarks && result.landmarks.length) ? result.landmarks[0] : null;
+  if(!result || !result.landmarks || !result.landmarks.length) return;
+  for(const landmarks of result.landmarks){
+    ctx.strokeStyle="#0f9f9a";
+    ctx.lineWidth=3;
+    for(const [a,b] of HAND_CONNECTIONS){
+      const p1=landmarks[a], p2=landmarks[b];
+      ctx.beginPath();
+      ctx.moveTo(p1.x*canvas.width, p1.y*canvas.height);
+      ctx.lineTo(p2.x*canvas.width, p2.y*canvas.height);
+      ctx.stroke();
+    }
+    ctx.fillStyle="#ffffff";
+    for(const p of landmarks){
+      ctx.beginPath();
+      ctx.arc(p.x*canvas.width, p.y*canvas.height, 4, 0, 2*Math.PI);
+      ctx.fill();
+    }
+  }
+}
+function speakTranslation(){const text=document.getElementById("translation")?.textContent;if(text&&"speechSynthesis"in window){speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(text));toast("Speaking translation")}else toast("Speech is not supported")}
+function copyTranslation(){navigator.clipboard?.writeText(document.getElementById("translation").textContent);toast("Translation copied")}
+function clearTranslation(){document.getElementById("detected").textContent="—";document.getElementById("translation").textContent="—"}
+async function saveTranslation(){
+  const sign=document.getElementById("detected").textContent;
+  if(sign==="—")return;
+  const translation=document.getElementById("translation").textContent;
+  try{
+    await api("/translations", { method:"POST", body: JSON.stringify({ sign, translation, input: "Camera/Demo" }) });
+    toast("Translation saved successfully");
+  }catch(err){ toast(err.message); }
+}
+
+/* ===================== DICTIONARY / FAVORITES (shared) ===================== */
+function normalizeFavorites(data){
+  if(!Array.isArray(data)) return [];
+  return data.map(f => typeof f === "string" ? f : (f.signName || f.sign || f.name)).filter(Boolean);
+}
+async function refreshFavoritesCache(){
+  try{
+    const data = await api("/favorites");
+    favoritesCache = normalizeFavorites(data);
+  }catch(err){ toast("Could not load favorites: "+err.message); }
+}
+function dictionaryHTML(){return `<div class="topline"><div><span class="badge">DICTIONARY</span><h1>Sign Language Dictionary</h1><p class="muted">Search and explore common signs.</p></div></div><div class="card"><div class="search-row"><input id="signSearch" class="input" placeholder="Search signs..." oninput="renderSigns()"><select id="categoryFilter" class="input" onchange="renderSigns()" style="max-width:220px"><option>All Categories</option>${[...new Set(signs.map(s=>s.category))].map(c=>`<option>${c}</option>`).join("")}</select></div><div id="signGrid" class="sign-grid"></div></div>`}
+async function renderSigns(){
+ await refreshFavoritesCache();
+ const grid=document.getElementById("signGrid");if(!grid)return;
+ const q=(document.getElementById("signSearch")?.value||"").toLowerCase(),cat=document.getElementById("categoryFilter")?.value||"All Categories";
+ const list=signs.filter(s=>(s.name+s.meaning+s.category).toLowerCase().includes(q)&&(cat==="All Categories"||s.category===cat));
+ grid.innerHTML=list.length?list.map(s=>signCard(s)).join(""):`<p class="muted">No results found.</p>`;
+}
+function signCard(s){const fav=favoritesCache.includes(s.name);return `<div class="card sign-card"><div class="sign-img">${s.icon}</div><h3>${s.name}</h3><small>${s.category}</small><p style="margin-top:8px">${s.meaning}</p><div class="sign-actions"><button class="btn btn-light" onclick="toggleFavorite('${s.name}')">${fav?"♥":"♡"} Favorite</button><button class="btn btn-primary" onclick="practice('${s.name}')">Learn</button></div></div>`}
+function favoritesHTML(){return `<div class="topline"><div><span class="badge">FAVORITES</span><h1>Saved Signs</h1><p class="muted">Your frequently used signs.</p></div></div><div id="favoritesGrid" class="sign-grid"><p class="muted">Loading…</p></div>`}
+async function loadFavorites(){
+  await refreshFavoritesCache();
+  const g=document.getElementById("favoritesGrid");if(!g)return;
+  const list=signs.filter(s=>favoritesCache.includes(s.name));
+  g.innerHTML=list.length?list.map(s=>signCard(s)).join(""):`<div class="card" style="grid-column:1/-1;text-align:center"><h3>No favorites yet</h3><p class="muted">Save signs from the dictionary or translator.</p></div>`;
+}
+async function toggleFavorite(name){
+  try{
+    if(favoritesCache.includes(name)){
+      await api(`/favorites/${encodeURIComponent(name)}`, { method:"DELETE" });
+    } else {
+      await api("/favorites", { method:"POST", body: JSON.stringify({ signName: name }) });
+    }
+    await refreshFavoritesCache();
+    toast(favoritesCache.includes(name)?"Added to favorites.":"Removed from favorites.");
+    renderSigns();
+    loadFavorites();
+  }catch(err){ toast(err.message); }
+}
+function practice(name){const s=signs.find(x=>x.name===name);appPage("translator");setTimeout(()=>{document.querySelector(".result select").value=s.name;selectSign(s.name)},20)}
+
+/* ===================== HISTORY ===================== */
+function normalizeTranslations(data){
+  if(!Array.isArray(data)) return [];
+  return data.map(h=>({
+    id: h.id || h._id,
+    sign: h.sign,
+    translation: h.translation,
+    date: h.date || (h.createdAt ? new Date(h.createdAt).toLocaleDateString() : ""),
+    time: h.time || (h.createdAt ? new Date(h.createdAt).toLocaleTimeString() : ""),
+    input: h.input || "Camera/Demo"
+  }));
+}
+function historyHTML(){return `<div class="topline"><div><span class="badge">HISTORY</span><h1>Translation History</h1><p class="muted">Review your previous translations.</p></div><button class="btn btn-danger" onclick="clearHistory()">Clear All</button></div><div class="card"><div class="search-row"><input id="historySearch" class="input" placeholder="Search history..." oninput="renderHistory()"></div><div id="historyTable" class="table-wrap"><p class="muted">Loading…</p></div></div>`}
+async function loadHistory(){
+  try{
+    const data = await api("/translations");
+    historyCache = normalizeTranslations(data);
+  }catch(err){ toast("Could not load history: "+err.message); historyCache=[]; }
+  renderHistory();
+}
+function renderHistory(){
+  const el=document.getElementById("historyTable");if(!el)return;
+  const q=(document.getElementById("historySearch")?.value||"").toLowerCase();
+  const h=historyCache.filter(x=>(x.sign+x.translation).toLowerCase().includes(q));
+  el.innerHTML=h.length?`<table class="table"><thead><tr><th>Sign</th><th>Translation</th><th>Date</th><th>Time</th><th>Input</th><th></th></tr></thead><tbody>${h.map(x=>`<tr><td>${escapeHtml(x.sign)}</td><td>${escapeHtml(x.translation)}</td><td>${escapeHtml(x.date)}</td><td>${escapeHtml(x.time)}</td><td>${escapeHtml(x.input)}</td><td><button class="btn btn-danger" onclick="deleteHistory('${x.id}')">Delete</button></td></tr>`).join("")}</tbody></table>`:`<p class="muted">No results found.</p>`;
+}
+async function deleteHistory(id){
+  try{ await api(`/translations/${id}`, { method:"DELETE" }); await loadHistory(); }catch(err){ toast(err.message); }
+}
+async function clearHistory(){
+  try{ await api("/translations", { method:"DELETE" }); toast("History cleared"); await loadHistory(); }catch(err){ toast(err.message); }
+}
+
+/* ===================== LEARNING / PROGRESS ===================== */
+function learningHTML(){
+ return `<div class="topline"><div><span class="badge">LEARNING</span><h1>Learn Sign Language</h1><p class="muted">Practice signs and track your progress.</p></div></div><div class="card"><h2>Continue Learning</h2><p style="margin:8px 0">Basic Greetings</p><div class="progress"><div id="learnProgressBar" style="width:0%"></div></div><p class="muted" style="margin:7px 0 15px" id="learnProgressText">Loading…</p><button class="btn btn-primary" onclick="increaseProgress()">Continue</button></div><div class="cards" style="margin-top:18px">${["Beginner","Intermediate","Advanced","Alphabet","Numbers","Common Phrases"].map((x,i)=>`<div class="card"><h3>${x}</h3><p>${i<2?"Start with essential signs and phrases.":"Explore this learning category."}</p><button class="btn btn-light" style="margin-top:14px" onclick="toast('Lesson opened: ${x}')">Open Lesson →</button></div>`).join("")}</div>`;
+}
+async function loadProgress(){
+  try{
+    const data = await api("/progress");
+    progressCache = data?.progress ?? 0;
+  }catch(err){ toast("Could not load progress: "+err.message); }
+  const bar=document.getElementById("learnProgressBar");
+  const text=document.getElementById("learnProgressText");
+  if(bar) bar.style.width = progressCache+"%";
+  if(text) text.textContent = progressCache+"% complete";
+}
+async function increaseProgress(){
+  const newProgress = Math.min(100, progressCache+5);
+  try{
+    await api("/progress", { method:"PUT", body: JSON.stringify({ progress:newProgress, course:"Basic Greetings" }) });
+    toast("Learning progress updated");
+    await loadProgress();
+  }catch(err){ toast(err.message); }
+}
+
+/* ===================== PROFILE ===================== */
+function profileHTML(name){return `<div class="topline"><div><span class="badge">PROFILE</span><h1>Your Profile</h1></div></div><div class="profile-grid"><div class="card"><div class="avatar">${(name||"U")[0].toUpperCase()}</div><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(currentUser?.email||"")}</p><hr style="border:0;border-top:1px solid var(--border);margin:18px 0"><p class="muted">Account statistics</p><h3 style="margin-top:8px" id="profileStatCount">…</h3></div><div class="card"><h2>Edit Profile</h2><form onsubmit="saveProfile(event)"><div class="form-group"><label>Full Name</label><input id="profileName" class="input" value="${escapeAttr(name)}" required></div><div class="form-group"><label>Email</label><input id="profileEmail" class="input" type="email" value="${escapeAttr(currentUser?.email||"")}" required></div><div class="form-group"><label>Phone</label><input id="profilePhone" class="input" value="${escapeAttr(currentUser?.phone||"")}"></div><div class="form-group"><label>Preferred Language</label><select id="profileLang" class="input"><option ${currentUser?.language==="English"?"selected":""}>English</option><option ${currentUser?.language==="Telugu"?"selected":""}>Telugu</option><option ${currentUser?.language==="Hindi"?"selected":""}>Hindi</option></select></div><button class="btn btn-primary">Save Changes</button></form></div></div>`}
+async function saveProfile(e){
+  e.preventDefault();
+  try{
+    const updated = await api("/me", { method:"PUT", body: JSON.stringify({
+      name: document.getElementById("profileName").value,
+      email: document.getElementById("profileEmail").value,
+      phone: document.getElementById("profilePhone").value,
+      language: document.getElementById("profileLang").value
+    })});
+    currentUser = { ...currentUser, ...updated };
+    localStorage.setItem("signeaseUser", JSON.stringify(currentUser));
+    toast("Profile updated");
+    appPage("profile");
+  }catch(err){ toast(err.message); }
+}
+
+/* ===================== FEEDBACK ===================== */
+function feedbackHTML(){return `<div class="topline"><div><span class="badge">FEEDBACK</span><h1>Help us improve SignEase</h1><p class="muted">Tell us about your experience.</p></div></div><div class="card" style="max-width:750px"><form onsubmit="submitFeedback(event)"><div class="form-group"><label>Rating</label><div id="stars" style="font-size:30px;letter-spacing:5px"><span onclick="rate(1)">☆</span><span onclick="rate(2)">☆</span><span onclick="rate(3)">☆</span><span onclick="rate(4)">☆</span><span onclick="rate(5)">☆</span></div></div><div class="form-group"><label>Feedback Type</label><select id="feedbackType" class="input"><option>Translation Accuracy</option><option>UI Experience</option><option>Learning Module</option><option>Camera</option><option>General Feedback</option></select></div><div class="form-group"><label>Message</label><textarea id="feedbackMsg" class="input" rows="6" required></textarea></div><button class="btn btn-primary">Submit Feedback</button></form></div>`}
+let rating=0;function rate(n){rating=n;document.querySelectorAll("#stars span").forEach((s,i)=>s.textContent=i<n?"★":"☆")}
+async function submitFeedback(e){
+  e.preventDefault();
+  try{
+    await api("/feedback", { method:"POST", body: JSON.stringify({
+      rating, type: document.getElementById("feedbackType").value, message: document.getElementById("feedbackMsg").value
+    })});
+    toast("Thank you for helping us improve SignEase!");
+    e.target.reset();
+    rate(0);
+  }catch(err){ toast(err.message); }
+}
+
+/* ===================== ADMIN (still local demo data) ===================== */
+function adminHTML(){return `<div class="topline"><div><span class="badge">ADMIN PANEL</span><h1>Administration</h1><p class="muted">Manage demo users, signs and feedback.</p></div></div><div class="admin-tabs"><button class="btn btn-light active" onclick="renderAdmin('users')">Users</button><button class="btn btn-light" onclick="renderAdmin('signs')">Signs</button></div><div id="adminContent"></div>`}
+function renderAdmin(type){const el=document.getElementById("adminContent");if(!el)return;if(type==="users"){el.innerHTML=`<div class="card"><h2>User Management</h2><div class="table-wrap"><table class="table"><thead><tr><th>User</th><th>Email</th><th>Role</th><th>Status</th></tr></thead><tbody><tr><td>${escapeHtml(currentUser?.name||"")}</td><td>${escapeHtml(currentUser?.email||"")}</td><td>${escapeHtml(currentUser?.role||"user")}</td><td><span class="badge">${escapeHtml(currentUser?.status||"Active")}</span></td></tr></tbody></table></div><p class="muted" style="margin-top:12px">Full admin user listing requires wiring this tab to a backend admin endpoint.</p></div>`}else{el.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:15px"><h2>Sign Management</h2><button class="btn btn-primary" onclick="toast('Add Sign form is ready for backend CRUD integration.')">+ Add Sign</button></div><div class="table-wrap"><table class="table"><thead><tr><th>Sign</th><th>Meaning</th><th>Category</th><th>Actions</th></tr></thead><tbody>${signs.map(s=>`<tr><td>${s.name}</td><td>${s.meaning}</td><td>${s.category}</td><td><button class="btn btn-light" onclick="toast('Edit: ${s.name}')">Edit</button> <button class="btn btn-danger" onclick="toast('Delete: ${s.name}')">Delete</button></td></tr>`).join("")}</tbody></table></div></div>`}}
+
+/* ===================== TRAIN SIGNS (data capture for ML) ===================== */
+const TRAINING_STORAGE_KEY="signeaseTrainingData";
+
+function getTrainingData(){
+  try{ return JSON.parse(localStorage.getItem(TRAINING_STORAGE_KEY)||"[]"); }
+  catch(e){ return []; }
+}
+function saveTrainingData(data){
+  localStorage.setItem(TRAINING_STORAGE_KEY, JSON.stringify(data));
+}
+
+function trainHTML(){
+ return `<div class="topline"><div><span class="badge">TRAIN SIGNS</span><h1>Capture Training Data</h1><p class="muted">Start the camera, hold a pose, and capture samples for each sign. Aim for 30-50 samples per sign from slightly different angles/distances.</p></div></div>
+ <div class="translator-grid">
+   <div class="card"><div class="camera-box"><video id="cameraVideo" autoplay playsinline class="hidden"></video><canvas id="landmarkCanvas" class="hidden"></canvas><div id="landmarkStatus" class="landmark-status hidden">Loading hand model…</div><div id="cameraPlaceholder" class="camera-placeholder"><div style="font-size:70px">📷</div><h2>Live Camera</h2><p>Start the camera to begin.</p></div><div class="camera-controls"><button class="btn" onclick="startCamera()">▶ Start Camera</button><button class="btn" onclick="stopCamera()">■ Stop Camera</button></div></div></div>
+   <div class="result">
+     <div class="card">
+       <h3>Sign to capture</h3>
+       <select id="trainSignSelect" class="input" style="margin-top:10px">${signs.map(s=>`<option>${s.name}</option>`).join("")}</select>
+       <button class="btn btn-primary" style="width:100%;margin-top:14px" onclick="captureSample()">📸 Capture Sample</button>
+       <div class="notice" style="margin-top:12px">Hold the pose steady, make sure the teal hand overlay is visible, then click Capture. Repeat many times per sign with small variations.</div>
+     </div>
+     <div class="card">
+       <h3>Samples collected</h3>
+       <div id="sampleCounts" class="table-wrap" style="margin-top:10px"></div>
+       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+         <button class="btn btn-light" onclick="exportTrainingData()">⬇ Export dataset (.json)</button>
+         <button class="btn btn-danger" onclick="clearTrainingData()">Clear all samples</button>
+       </div>
+     </div>
+   </div>
+ </div>`;
+}
+
+function refreshSampleCounts(){
+  const el=document.getElementById("sampleCounts");
+  if(!el) return;
+  const data=getTrainingData();
+  const counts={};
+  signs.forEach(s=>counts[s.name]=0);
+  data.forEach(d=>{ if(counts[d.label]!==undefined) counts[d.label]++; else counts[d.label]=(counts[d.label]||0)+1; });
+  const rows=Object.entries(counts).map(([name,count])=>`<tr><td>${escapeHtml(name)}</td><td>${count}</td></tr>`).join("");
+  el.innerHTML=`<table class="table"><thead><tr><th>Sign</th><th>Samples</th></tr></thead><tbody>${rows}</tbody></table><p class="muted" style="margin-top:10px">Total: ${data.length} samples</p>`;
+}
+
+function captureSample(){
+  if(!lastDetectedLandmarks){
+    toast("No hand detected — make sure the camera is running and your hand is visible.");
+    return;
+  }
+  const label=document.getElementById("trainSignSelect").value;
+  const flattened=[];
+  for(const p of lastDetectedLandmarks){ flattened.push(p.x, p.y, p.z); }
+  const data=getTrainingData();
+  data.push({ label, landmarks: flattened, capturedAt: new Date().toISOString() });
+  saveTrainingData(data);
+  toast(`Captured sample for "${label}"`);
+  refreshSampleCounts();
+}
+
+function exportTrainingData(){
+  const data=getTrainingData();
+  if(!data.length){ toast("No samples captured yet."); return; }
+  const blob=new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="signease-training-data.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast("Dataset exported");
+}
+
+function clearTrainingData(){
+  if(!confirm("Delete all captured training samples? This cannot be undone.")) return;
+  localStorage.removeItem(TRAINING_STORAGE_KEY);
+  refreshSampleCounts();
+  toast("Training data cleared");
+}
+
+/* ===================== HELPERS ===================== */
+function toggleTextSize(){document.body.style.fontSize=document.body.style.fontSize==="18px"?"":"18px";toast("Text size updated")}
+function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function escapeAttr(s){return escapeHtml(s)}
+window.addEventListener("beforeunload",stopCamera);
+if(currentUser)showPage("app");else showPage("landing");
+</script>
+</body>
+</html>
